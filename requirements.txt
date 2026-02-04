@@ -1,0 +1,4 @@
+git+https://github.com/OperavonderVollmer/OperaPowerRelay.git
+git+https://github.com/OperavonderVollmer/PluginTemplate.git
+git+https://github.com/OperavonderVollmer/TrayIcon.git
+
