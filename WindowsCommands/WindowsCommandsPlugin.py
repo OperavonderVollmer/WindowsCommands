@@ -1,9 +1,11 @@
 import os, sys
+
+from PluginTemplate.DSL import JS_Container
 root = os.path.dirname(os.path.abspath(__file__))
 if root not in sys.path:
     sys.path.insert(0, root)
 import DataClasses
-from PluginTemplate import PluginTemplate
+from PluginTemplate import PluginTemplate, DSL
 
 class plugin(PluginTemplate.ophelia_plugin):
     def __init__(self):
@@ -28,10 +30,26 @@ class plugin(PluginTemplate.ophelia_plugin):
                 "Restart in 30 minutes": lambda **kwargs: self.windows_commands.restart(delay=1800),
                 "Restart in 1 hour": lambda **kwargs: self.windows_commands.restart(delay=3600),
                 "Logoff now": self.windows_commands.logoff,
-                "Cancel Command": self.windows_commands.cancel_shutdown
+                "Cancel Previous Command": self.windows_commands.cancel_shutdown
             },
         )
 
+    def input_scheme(self, root: JS_Container = None, form: bool = None, serialize: bool = False):
+        return super().input_scheme(root = DSL.JS_Div(
+            id="windows-commands-div",
+            children=[
+                DSL.JS_Select(
+                    id="windows-commands-select-command",
+                    label="Select Command",
+                    options=list(key.upper() for key in self._meta["command_map"].keys())
+                ),
+                DSL.JS_Select(
+                    id="windows-commands-select-quick-command",
+                    label="Select Quick Command",
+                    options=list(self._meta["quick_commands"].keys())
+                )
+            ]
+        ), form=form, serialize=serialize)
 
     def execute(self, *args, **kwargs):
         return self.windows_commands.execute_command(type_of_input=self._meta["type_of_input"], **kwargs)
