@@ -2,14 +2,14 @@ import os, sys
 root = os.path.dirname(os.path.abspath(__file__))
 if root not in sys.path:
     sys.path.insert(0, root)
-import DataClasses
+import WindowsCommandsDataClasses
 from OperaPowerRelay import opr
 
 
 
 
 def main():
-    wc = DataClasses.WindowsCommandsClass(type_of_input="console")
+    wc = WindowsCommandsDataClasses.WindowsCommandsClass(type_of_input="console")
 
     try:
         wc.execute_command()

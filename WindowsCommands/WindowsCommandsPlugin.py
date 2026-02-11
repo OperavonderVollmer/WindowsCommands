@@ -4,14 +4,14 @@ from PluginTemplate.DSL import JS_Container
 root = os.path.dirname(os.path.abspath(__file__))
 if root not in sys.path:
     sys.path.insert(0, root)
-import DataClasses
+from WindowsCommandsDataClasses import WindowsCommandsClass
 from PluginTemplate import PluginTemplate, DSL
 
 class plugin(PluginTemplate.ophelia_plugin):
     def __init__(self):
         
         # TODO: Change to browser once HUD side is implemented
-        self.windows_commands = DataClasses.WindowsCommandsClass(type_of_input="console") 
+        self.windows_commands = WindowsCommandsClass(type_of_input="console") 
         super().__init__(
             name="WindowsCommands",
             description="A plugin to execute Windows system commands like shutdown, restart, and logoff.",
