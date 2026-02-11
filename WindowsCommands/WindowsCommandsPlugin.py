@@ -20,7 +20,8 @@ class plugin(PluginTemplate.ophelia_plugin):
             command_map={
                 "shutdown": self.windows_commands.shutdown,
                 "restart": self.windows_commands.restart,
-                "logoff": self.windows_commands.logoff
+                "logoff": self.windows_commands.logoff,
+                "cancel": self.windows_commands.cancel_shutdown
             },
             quick_commands={
                 "Shutdown now": self.windows_commands.shutdown,
@@ -35,22 +36,106 @@ class plugin(PluginTemplate.ophelia_plugin):
         )
 
     def input_scheme(self, root: JS_Container = None, form: bool = None, serialize: bool = False):
+        presets = {
+            "Shutdown now":{
+                "windows-commands-select-command": "shutdown",
+                "windows-commands-delay-input-hours": "0",
+                "windows-commands-delay-input-minutes": "0",
+                "windows-commands-delay-input-seconds": "0",
+            },
+            "Shutdown in 30 minutes":{
+                "windows-commands-select-command": "shutdown",
+                "windows-commands-delay-input-hours": "0",
+                "windows-commands-delay-input-minutes": "30",
+                "windows-commands-delay-input-seconds": "0",
+            },
+            "Shutdown in 1 hour":{
+                "windows-commands-select-command": "shutdown",
+                "windows-commands-delay-input-hours": "1",
+                "windows-commands-delay-input-minutes": "0",
+                "windows-commands-delay-input-seconds": "0",
+            },
+            "Restart now":{
+                "windows-commands-select-command": "restart",
+                "windows-commands-delay-input-hours": "0",
+                "windows-commands-delay-input-minutes": "0",
+                "windows-commands-delay-input-seconds": "0",
+            },
+            "Restart in 30 minutes":{
+                "windows-commands-select-command": "restart",
+                "windows-commands-delay-input-hours": "0",
+                "windows-commands-delay-input-minutes": "30",
+                "windows-commands-delay-input-seconds": "0",
+            },
+            "Restart in 1 hour":{
+                "windows-commands-select-command": "restart",
+                "windows-commands-delay-input-hours": "1",
+                "windows-commands-delay-input-minutes": "0",
+                "windows-commands-delay-input-seconds": "0",
+            },
+            "Logoff now":{
+                "windows-commands-select-command": "logoff",
+                "windows-commands-delay-input-hours": "0",
+                "windows-commands-delay-input-minutes": "0",
+                "windows-commands-delay-input-seconds": "0",
+            },
+            "Cancel Previous Command":{
+                "windows-commands-select-command": "cancel",
+                "windows-commands-delay-input-hours": "0",
+                "windows-commands-delay-input-minutes": "0",
+                "windows-commands-delay-input-seconds": "0",
+            }
+        }
         return super().input_scheme(root = DSL.JS_Div(
             id="windows-commands-div",
             children=[
+                DSL.JS_Select(
+                    id="windows-commands-select-quick-command",
+                    label="Preset Commands",
+                    options=list(key for key in presets.keys())
+                ),
                 DSL.JS_Select(
                     id="windows-commands-select-command",
                     label="Select Command",
                     options=list(key.upper() for key in self._meta["command_map"].keys())
                 ),
-                DSL.JS_Select(
-                    id="windows-commands-select-quick-command",
-                    label="Select Quick Command",
-                    options=list(self._meta["quick_commands"].keys())
+                DSL.JS_Header_Div(
+                    id="windows-commands-delay-div",
+                    header="Delay - 0 for no delay",
+                    header_level=3,
+                    child=DSL.JS_Div(
+                        id="windows-commands-delay-input-div",
+                        classes="horizontal-div",
+                        children=[
+                            DSL.JS_TextBox(
+                                id="windows-commands-delay-input-hours",
+                                label="HH",
+                                type="number",
+                                hint="Hours",
+                            ),
+                            DSL.JS_TextBox(
+                                id="windows-commands-delay-input-minutes",
+                                label="MM",
+                                type="number",
+                                hint="Minutes",
+                            ),
+                            DSL.JS_TextBox(
+                                id="windows-commands-delay-input-seconds",
+                                label="SS",
+                                type="number",
+                                hint="Seconds",
+                            ),
+                        ]
+                    )
                 )
             ]
-        ), form=form, serialize=serialize)
+        ), 
+        form=form, serialize=serialize, 
+        effects = { "windows-commands-select-quick-command": "applyPreset" },
+        presets=presets
+        )
 
+    
     def execute(self, *args, **kwargs):
         return self.windows_commands.execute_command(type_of_input=self._meta["type_of_input"], **kwargs)
 

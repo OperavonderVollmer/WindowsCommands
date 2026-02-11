@@ -139,17 +139,19 @@ class WindowsCommandsClass:
                             opr.print_from(name="WindowsCommands", message="\nOperation cancelled by user.")
                             return None
                 case "browser":
-                    answer = PluginTemplate.ophelia_input.browser_input(
-                        prompt=DSL.JS_Page(
-                            title="Windows Command Input",
-                            root=self.DEFAULT_PAGE,
-                        ))  
-                    command = answer.get("windows-command-input-select", "")
-                    delay = (
-                        int(answer.get("windows-command-input-textbox-hours", 0)) * 3600 +
-                        int(answer.get("windows-command-input-textbox-minutes", 0)) * 60 +
-                        int(answer.get("windows-command-input-textbox-seconds", 0))
-                    )
+                    # answer = PluginTemplate.ophelia_input.browser_input(
+                    #     prompt=DSL.JS_Page(
+                    #         title="Windows Command Input",
+                    #         root=self.DEFAULT_PAGE,
+                    #     ))  
+                    # command = answer.get("windows-command-input-select", "")
+                    # delay = (
+                    #     int(answer.get("windows-command-input-textbox-hours", 0)) * 3600 +
+                    #     int(answer.get("windows-command-input-textbox-minutes", 0)) * 60 +
+                    #     int(answer.get("windows-command-input-textbox-seconds", 0))
+                    # )
+                    print("unused")
+                    return
                 case _:
                     raise ValueError("Invalid type_of_input. Must be 'console' or 'browser'.")
                 
