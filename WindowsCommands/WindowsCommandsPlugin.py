@@ -18,10 +18,10 @@ class plugin(PluginTemplate.ophelia_plugin):
             needs_args=True,
             type_of_input="console",
             command_map={
-                "shutdown": self.windows_commands.shutdown,
-                "restart": self.windows_commands.restart,
-                "logoff": self.windows_commands.logoff,
-                "cancel": self.windows_commands.cancel_shutdown
+                "shutdown": self.handle_shutdown,
+                "restart": self.handle_restart,
+                "logoff": self.handle_logoff,
+                "cancel": self.handle_cancel_shutdown
             },
             quick_commands={
                 "Shutdown now": self.windows_commands.shutdown,
@@ -34,6 +34,74 @@ class plugin(PluginTemplate.ophelia_plugin):
                 "Cancel Previous Command": self.windows_commands.cancel_shutdown
             },
         )
+
+    def handle_shutdown(self, delay=0, **kwargs):
+        if self.windows_commands.shutdown(delay=delay or kwargs.get("delay", 0)):
+            text = f"Shutdown command executed with delay of {delay} seconds."
+        else:
+            text = "Failed to execute shutdown command."
+        return super().input_scheme(
+            root=DSL.JS_Div(
+                id="windows-commands-shutdown-div",
+                children=[
+                    DSL.JS_Label(
+                        id="windows-commands-shutdown-label",
+                        text=text
+                    ),
+                ]
+            ),
+            form=True, serialize=True)
+
+    def handle_restart(self, delay=0, **kwargs):
+        if self.windows_commands.restart(delay=delay or kwargs.get("delay", 0)):
+            text = f"Restart command executed with delay of {delay} seconds."
+        else:
+            text = "Failed to execute restart command."
+        return super().input_scheme(
+            root=DSL.JS_Div(
+                id="windows-commands-restart-div",
+                children=[
+                    DSL.JS_Label(
+                        id="windows-commands-restart-label",
+                        text=text
+                    ),
+                ]
+            ),
+            form=True, serialize=True)
+
+    def handle_logoff(self, delay=0, **kwargs):
+        if self.windows_commands.logoff(delay=delay or kwargs.get("delay", 0)):
+            text = f"Logoff command executed with delay of {delay} seconds."
+        else:
+            text = "Failed to execute logoff command."
+        return super().input_scheme(
+            root=DSL.JS_Div(
+                id="windows-commands-logoff-div",
+                children=[
+                    DSL.JS_Label(
+                        id="windows-commands-logoff-label",
+                        text=text
+                    ),
+                ]
+            ),
+            form=True, serialize=True)
+
+    def handle_cancel_shutdown(self, **kwargs):
+        if self.windows_commands.cancel_shutdown():
+            text = "Cancel shutdown command executed."
+        else:
+            text = "Failed to execute cancel previous command."
+        return super().input_scheme(
+            root=DSL.JS_Div(
+                id="windows-commands-cancel-div",
+                children=[
+                    DSL.JS_Label(
+                        id="windows-commands-cancel-label",
+                        text=text
+                    ),
+                ]
+            ),
+            form=True, serialize=True)
 
     def input_scheme(self, root: JS_Container = None, form: bool = None, serialize: bool = True):
         presets = {
@@ -138,11 +206,14 @@ class plugin(PluginTemplate.ophelia_plugin):
 
     
     def execute(self, *args, **kwargs):
+        if "windows-commands-select-command" in kwargs:
+            return self.direct_execute(*args, **kwargs)
         return self.windows_commands.execute_command(type_of_input=self._meta["type_of_input"], **kwargs)
 
     def direct_execute(self, *args, **kwargs):
-        command = kwargs.get("command", "")
-        delay = kwargs.get("delay", 0)
+        command = str(kwargs.get("windows-commands-select-command", "")).lower()
+        delay = int(kwargs.get("windows-commands-delay-input-hours", 0))*3600 + int(kwargs.get("windows-commands-delay-input-minutes", 0))*60 + int(kwargs.get("windows-commands-delay-input-seconds", 0))
+
 
         return super().run_command(command=command,delay=delay,)
 
