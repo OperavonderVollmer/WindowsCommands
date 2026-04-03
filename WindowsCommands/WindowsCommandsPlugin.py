@@ -11,12 +11,12 @@ class plugin(PluginTemplate.ophelia_plugin):
     def __init__(self):
         
         # TODO: Change to browser once HUD side is implemented
-        self.windows_commands = WindowsCommandsClass(type_of_input="console") 
+        self.windows_commands = WindowsCommandsClass(type_of_input="browser") 
         super().__init__(
             name="WindowsCommands",
             description="A plugin to execute Windows system commands like shutdown, restart, and logoff.",
             needs_args=True,
-            type_of_input="console",
+            type_of_input="browser",
             command_map={
                 "shutdown": self.handle_shutdown,
                 "restart": self.handle_restart,
@@ -50,7 +50,7 @@ class plugin(PluginTemplate.ophelia_plugin):
                     ),
                 ]
             ),
-            form=True, serialize=True)
+            form=False, serialize=True)
 
     def handle_restart(self, delay=0, **kwargs):
         if self.windows_commands.restart(delay=delay or kwargs.get("delay", 0)):
@@ -67,7 +67,7 @@ class plugin(PluginTemplate.ophelia_plugin):
                     ),
                 ]
             ),
-            form=True, serialize=True)
+            form=False, serialize=True)
 
     def handle_logoff(self, delay=0, **kwargs):
         if self.windows_commands.logoff(delay=delay or kwargs.get("delay", 0)):
@@ -84,15 +84,15 @@ class plugin(PluginTemplate.ophelia_plugin):
                     ),
                 ]
             ),
-            form=True, serialize=True)
+            form=False, serialize=True)
 
     def handle_cancel_shutdown(self, **kwargs):
         if self.windows_commands.cancel_shutdown():
             text = "Cancel shutdown command executed."
         else:
             text = "Failed to execute cancel previous command."
-        return super().input_scheme(
-            root=DSL.JS_Div(
+        
+        root = DSL.JS_Div(
                 id="windows-commands-cancel-div",
                 children=[
                     DSL.JS_Label(
@@ -100,8 +100,8 @@ class plugin(PluginTemplate.ophelia_plugin):
                         text=text
                     ),
                 ]
-            ),
-            form=True, serialize=True)
+            )
+        return super().input_scheme(root=root, form=False, serialize=True)
 
     def input_scheme(self, root: JS_Container = None, form: bool = None, serialize: bool = True):
         presets = {
@@ -213,7 +213,6 @@ class plugin(PluginTemplate.ophelia_plugin):
     def direct_execute(self, *args, **kwargs):
         command = str(kwargs.get("windows-commands-select-command", "")).lower()
         delay = int(kwargs.get("windows-commands-delay-input-hours", 0))*3600 + int(kwargs.get("windows-commands-delay-input-minutes", 0))*60 + int(kwargs.get("windows-commands-delay-input-seconds", 0))
-
 
         return super().run_command(command=command,delay=delay,)
 

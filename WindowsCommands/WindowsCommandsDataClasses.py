@@ -1,62 +1,65 @@
 from OperaPowerRelay import opr
 import subprocess
 from PluginTemplate import PluginTemplate, DSL
+import os, sys
+root = os.path.dirname(os.path.abspath(__file__))
+if root not in sys.path:
+    sys.path.insert(0, root)
 
 class WindowsCommandsClass:
-
     
     def __init__(self, type_of_input: str = "console"):
         self._commands = {
             "shutdown": self.shutdown,
             "restart": self.restart,
             "logoff": self.logoff,
-            "cancel shutdown": self.cancel_shutdown,
+            "cancel": self.cancel_shutdown,
         }
         self.type_of_input = type_of_input
         self.DEFAULT_PAGE = DSL.JS_Div(
-                                id="windows-command-input-div",
-                                children=[
-                                    DSL.JS_Label(
-                                        id="windows-command-input-textbox",
-                                        text="Windows Command Input"
-                                    ),
-                                    DSL.JS_Select(
-                                        id="windows-command-input-select",
-                                        label="Select Command",
-                                        options=list(self._commands.keys()),
-                                    ),
-                                    DSL.JS_Div(
-                                        id="windows-command-input-delay-div",
-                                        children=[
-                                            DSL.JS_Label(
-                                                id="windows-command-input-label",
-                                                text="Enter Delay (where applicable)"
-                                            ),
-                                            DSL.JS_Div(
-                                                id="windows-command-input-div",
-                                                classes="horizontal-div",
-                                                children=[
-                                                    DSL.JS_TextBox(
-                                                        id="windows-command-input-textbox-hours",
-                                                        label="H",
-                                                        placeholder="0",
-                                                    ),
-                                                    DSL.JS_TextBox(
-                                                        id="windows-command-input-textbox-minutes",
-                                                        label="M",
-                                                        placeholder="0",
-                                                    ),
-                                                    DSL.JS_TextBox(
-                                                        id="windows-command-input-textbox-seconds",
-                                                        label="S",
-                                                        placeholder="0",   
-                                                    ),
-                                                ]
-                                            )
-                                        ]
-                                    ),
-                                ] # type: ignore
-                            )
+            id="windows-command-input-div",
+            children=[
+                DSL.JS_Label(
+                    id="windows-command-input-textbox",
+                    text="Windows Command Input"
+                ),
+                DSL.JS_Select(
+                    id="windows-command-input-select",
+                    label="Select Command",
+                    options=list(self._commands.keys()),
+                ),
+                DSL.JS_Div(
+                    id="windows-command-input-delay-div",
+                    children=[
+                        DSL.JS_Label(
+                            id="windows-command-input-label",
+                            text="Enter Delay (where applicable)"
+                        ),
+                        DSL.JS_Div(
+                            id="windows-command-input-div",
+                            classes="horizontal-div",
+                            children=[
+                                DSL.JS_TextBox(
+                                    id="windows-command-input-textbox-hours",
+                                    label="H",
+                                    placeholder="0",
+                                ),
+                                DSL.JS_TextBox(
+                                    id="windows-command-input-textbox-minutes",
+                                    label="M",
+                                    placeholder="0",
+                                ),
+                                DSL.JS_TextBox(
+                                    id="windows-command-input-textbox-seconds",
+                                    label="S",
+                                    placeholder="0",   
+                                ),
+                            ]
+                        )
+                    ]
+                ),
+            ] # type: ignore
+        )
 
     def shutdown(self, **kwargs):
         """
